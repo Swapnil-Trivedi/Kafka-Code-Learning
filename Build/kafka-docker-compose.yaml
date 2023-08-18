@@ -1,0 +1,139 @@
+version: "3.3"
+services:
+  kafka-1:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka-1
+    hostname: kafka-1
+    ports:
+      - "9091:9091"
+      - "9991:9991"
+    networks:
+      st-local-net:
+        ipv4_address: 172.16.1.101
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 101
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_JMX_PORT: 9991
+
+  kafka-2:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka-2
+    hostname: kafka-2
+    ports:
+      - "9092:9092"
+      - "9992:9992"
+    networks:
+      st-local-net:
+        ipv4_address: 172.16.1.102
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 102
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_JMX_PORT: 9992
+
+  kafka-3:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka-3
+    hostname: kafka-3
+    ports:
+      - "9093:9093"
+      - "9993:9993"
+    networks:
+      st-local-net:
+        ipv4_address: 172.16.1.103
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 103
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_JMX_PORT: 9993
+
+  kafka-manager:
+    image: kafkamanager/kafka-manager:3.0.0.4
+    container_name: kafka-manager
+    hostname: kafka-manager
+    ports:
+      - "8082:8082"
+    networks:
+      st-local-net:
+        ipv4_address: 172.16.1.110
+    environment:
+      ZK_HOSTS: zookeeper:2181
+      http.port: 8082
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.0.1
+    container_name: schema-registry
+    hostname: schema-registry
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    ports:
+      - "8081:8081"
+    networks:
+      st-local-net:
+        ipv4_address: 172.16.1.100
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:9091,kafka-2:9092,kafka-3:9093
+
+networks:
+  st-local-net:
+    external: true     
+    
+  # kafka-connect:
+  #   image: confluentinc/cp-kafka-connect:7.0.1
+  #   container_name: kafka-connect
+  #   hostname: kafka-connect
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka-1
+  #     - kafka-2
+  #     - kafka-3
+  #     - schema-registry
+  #   ports:
+  #     - 8083:8083
+  #     - 8888:8888
+  #   networks:
+  #     st-local-net:
+  #       ipv4_address: 172.16.1.111
+  #   environment:
+  #     CONNECT_BOOTSTRAP_SERVERS: "kafka-2:9092,kafka-3:9093,kafka-1:9091"
+  #     CONNECT_REST_PORT: 8083
+  #     KAFKA_DEBUG: "true"
+  #     JAVA_DEBUG_PORT: "*:8888"
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
+  #     CONNECT_GROUP_ID: connect-group
+  #     CONNECT_CONFIG_STORAGE_TOPIC: connect-avro-configs
+  #     CONNECT_OFFSET_STORAGE_TOPIC: connect-avro-offsets
+  #     CONNECT_STATUS_STORAGE_TOPIC: connect-avro-status
+  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_KEY_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+  #     CONNECT_VALUE_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+  #     CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+  #     CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+  #     CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+  #     CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+  #     CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
+  #     CONNECT_PLUGIN_PATH: '/usr/share/java,/etc/kafka-connect/jars'
+  #   volumes:
+  #     - ./jars:/etc/kafka-connect/jars
+
+ 
