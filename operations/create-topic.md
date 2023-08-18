@@ -12,3 +12,13 @@ kafka-console-producer --bootstrap-server kafka-1:9091 \
 ## Console consumer
  kafka-console-consumer --bootstrap-server kafka-1:9091 \
  --topic hello-topic --from-beginning
+
+## Creating topic with replicaation factor for multi-broker setup
+kafka-topics --create --bootstrap-server kafka-1:9091 \
+--replication-factor 3 --partitions 1 --topic Multibroker-App
+> Multi broker setup, partitions are replicated to secondary nodes along with the data and offset.
+
+## Describe topic
+ kafka-topics --describe --bootstrap-server kafka-1:9091 \
+--topic Multibroker-App
+
