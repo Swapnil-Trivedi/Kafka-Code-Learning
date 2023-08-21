@@ -12,7 +12,6 @@ import (
 
 const (
 	topic = "Multibroker-App"
-	group = "Group01"
 )
 
 func connectConsumer(broker []string) (sarama.Consumer, error) {
@@ -49,7 +48,7 @@ func main() {
 	if err != nil {
 		log.Errorf("Failed to create consumer")
 	}
-	log.Infof("Consumer up | Topic : %v GroupID : %v", topic, group)
+	log.Infof("Consumer up | Topic : %v ", topic)
 	//creating topic consumer
 	partConsumer, err := consumer.ConsumePartition(topic, 0, 0)
 	if err != nil {

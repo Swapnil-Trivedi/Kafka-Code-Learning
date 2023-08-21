@@ -22,3 +22,6 @@ kafka-topics --create --bootstrap-server kafka-1:9091 \
  kafka-topics --describe --bootstrap-server kafka-1:9091 \
 --topic Multibroker-App
 
+## Alter topic increase partition
+ kafka-topics --bootstrap-server kafka-1:9091 --alter \
+ --topic Multibroker-App --partitions 2
